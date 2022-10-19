@@ -12,6 +12,11 @@ Esta búsqueda bidireccional intentará que un Agente encuentre un Objetivo (Met
 ## Especificaciones
 
 Para este proyecto se usará el lenguaje de programación [Python](https://www.python.org/). Además de usar las librerias de [Turtle](https://docs.python.org/3/library/turtle.html) y [numpy](https://numpy.org/doc/stable/).
+Usa el comando:
+```python
+pip install numpy
+```
+Para instalar la librería de Numpy.
 
 ## Resultados
 
