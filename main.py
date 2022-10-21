@@ -1,71 +1,80 @@
 import turtle
 import numpy as np
 
-#Configuración de la ventana
-ancho = 800
-alto = 800
+# Window configuration
+width = 800
+height = 800
 
-# Tamaño de los cuadros de la grilla (Afecta a los movimientos, y posicionamiento correcto responsive).
-# Recomendado: 150
-paddingBox = 150
+# Size of grid boxes (Affects movements, and correct responsive positioning).
+# Recommended: 50
+paddingBox = 50
 
-# Estableciendo la ventana
+# Setting the window
 window = turtle.Screen()
-window.title("Inteligencia artificial")
-window.setworldcoordinates((-ancho/4),(-alto/4),ancho,alto)
+window.title("Artificial intelligence")
+window.setworldcoordinates((-width/4),(-height/4),width,height)
 window.bgcolor("#000000")
 window.tracer(0)
 
-#Añadir nuevas figuras con imágenes, solo acepta .gif
+# Add new figures with images, only .gif accepted
 window.addshape('agent.gif')
 window.addshape('chest.gif')
 window.addshape('meta.gif')
+window.addshape('wall.gif')
 
-# Carga del tablero mediante el archivo .txt
-# Solo acepta matrices cuadradas, es decir, NxN y no NxM
-tablero = np.loadtxt("./tablero.txt", delimiter=" ")
-# Tamaño de la matriz para configuraciones. No modificar.
-tableroSize = len(tablero)
+# Loading of the board via .txt file
+# Accepts only square matrices, i.e. NxN and not NxM
+board = np.loadtxt("./board.txt", delimiter=" ")
+# Matrix size for configurations. Do not modify.
+boardSize = len(board)
 
-# Busca elementos en la matriz, para conocer sus coordenadas.
+# Search for elements in the matrix, to know their coordinates.
 def searchItem(item):
-    for i in range(tableroSize):
-        for j in range(tableroSize):
-            if tablero[j][i] == item:
+    for i in range(boardSize):
+        for j in range(boardSize):
+            if board[j][i] == item:
                 return np.array((j,i))
 
-#Agente
+# Agent
 size = 4.0
-playerCoord = searchItem(1)
+playerCoord = [1,1]
 print(playerCoord)
 player = turtle.Turtle()
 player.penup()
 player.speed(6)
 player.shape('agent.gif')
 player.shapesize(size - 0.5)
-# Configura la posición inicial del jugador respecto a la posición declarada en la matriz.
-player.goto((paddingBox / 2)+(playerCoord[0]*paddingBox),((tableroSize*paddingBox - (paddingBox / 2)) - (playerCoord[1]*paddingBox)))
+# Sets the initial position of the player with respect to the position declared in the matrix.
+player.goto((paddingBox / 2)+(playerCoord[0]*paddingBox),((boardSize*paddingBox - (paddingBox / 2)) - (playerCoord[1]*paddingBox)))
 player.direction = "stop"
 
-#Meta
-metaCoord = searchItem(2)
+# Meta
+metaCoord = [10, 10]
 meta = turtle.Turtle()
 meta.penup()
 meta.speed(0)
 meta.shape("chest.gif")
 meta.shapesize(size - 0.5)
-# Configura la posición inicial de la meta respecto a la posición declarada en la matriz.
-meta.goto((paddingBox / 2)+(metaCoord[0]*paddingBox),((tableroSize*paddingBox - (paddingBox / 2)) - (metaCoord[1]*paddingBox)))
+# Sets the initial position of the target with respect to the declared position in the matriz.
+meta.goto(((paddingBox / 2)+(metaCoord[0]*paddingBox)),((boardSize*paddingBox - (paddingBox / 2)) - (metaCoord[1]*paddingBox)))
 
-#Costo de movimientos acumulado
-costo = 0
+# Walls
+wall = turtle.Turtle()
+wall.penup()
+wall.shape('wall.gif')
+wall.shapesize(1.3,1.7)
+wall.color("#FFFFFF")
+wall.goto((paddingBox / 2), (paddingBox * boardSize) - (paddingBox / 2))
 
-# Identifica si se llega a la meta, de ser así, cambia el icono y además cálcula el costo
-# acumulado por cada movimiento del jugador.
+# Cumulated movement cost
+cost = 0
+
+# It identifies whether the goal is reached, if so, it changes the icon and also calculates 
+# the accumulated cost for each player's move.
 def isMeta():
-    global costo
-    costo = costo + 1
-    print("Costo actual acumulado: " + str(costo))
+    global cost
+    cost = cost + 1
+    print("Cumulative current cost: " + str(cost))
     if(meta.position() == player.position()):
         meta.shape("meta.gif")
         player.hideturtle()
@@ -75,44 +84,54 @@ def isMeta():
         player.showturtle()
         return False
 
-#Grilla
-grilla = turtle.Turtle()
-grilla.pensize(2)
-grilla.color("#C8D8EE")
-grilla.penup()
-grilla.goto(0,0)
-grilla.pendown()
 
-# Generación automatica de la grilla (malla de líneas) dependiendo del tamaño de la matriz.
+def generateWalls(n,matriz):
+    for i in range(n):
+        for j in range(n):
+            wall.goto((paddingBox / 2), (paddingBox * n) - (paddingBox / 2))
+            if(matriz[i][j] == 1):
+                wall.goto(i*paddingBox+wall.xcor(), wall.ycor()-(j*paddingBox))
+                wall.stamp()
+generateWalls(boardSize,board)
+
+# Setup Grid
+grid = turtle.Turtle()
+grid.pensize(2)
+grid.color("#C8D8EE")
+grid.penup()
+grid.goto(0,0)
+grid.pendown()
+
+# Automatic generation of the grid (grid of lines) depending on the size of the matrix.
 def generateGrid(n,size):
     for i in range(n+1):
-        if (grilla.xcor() == 0 and grilla.ycor() == 0):
-            grilla.goto(grilla.xcor(),(size*n))
-        elif(grilla.ycor() == 0):
-            grilla.goto(grilla.xcor()+paddingBox,grilla.ycor())
-            grilla.goto(grilla.xcor(),grilla.ycor()+(size*n))
-        elif (grilla.ycor() != 0):
-            grilla.goto(grilla.xcor()+paddingBox,grilla.ycor())
-            grilla.goto(grilla.xcor(),grilla.ycor()-(size*n))
-    grilla.penup()
-    grilla.goto(0,0)
-    grilla.pendown()
+        if (grid.xcor() == 0 and grid.ycor() == 0):
+            grid.goto(grid.xcor(),(size*n))
+        elif(grid.ycor() == 0):
+            grid.goto(grid.xcor()+paddingBox,grid.ycor())
+            grid.goto(grid.xcor(),grid.ycor()+(size*n))
+        elif (grid.ycor() != 0):
+            grid.goto(grid.xcor()+paddingBox,grid.ycor())
+            grid.goto(grid.xcor(),grid.ycor()-(size*n))
+    grid.penup()
+    grid.goto(0,0)
+    grid.pendown()
     for i in range(n+1):
-        if (grilla.xcor() == 0 and grilla.ycor() == 0):
-            grilla.goto((size*n),grilla.ycor())
-        elif(grilla.xcor() == 0):
-            grilla.goto(grilla.xcor(),grilla.ycor()+paddingBox)
-            grilla.goto(grilla.xcor()+(size*n),grilla.ycor())
-        elif (grilla.xcor() != 0):
-            grilla.goto(grilla.xcor(),grilla.ycor()+paddingBox)
-            grilla.goto(grilla.xcor()-(size*n),grilla.ycor())
-generateGrid(tableroSize,paddingBox)
-grilla.hideturtle()
+        if (grid.xcor() == 0 and grid.ycor() == 0):
+            grid.goto((size*n),grid.ycor())
+        elif(grid.xcor() == 0):
+            grid.goto(grid.xcor(),grid.ycor()+paddingBox)
+            grid.goto(grid.xcor()+(size*n),grid.ycor())
+        elif (grid.xcor() != 0):
+            grid.goto(grid.xcor(),grid.ycor()+paddingBox)
+            grid.goto(grid.xcor()-(size*n),grid.ycor())
+generateGrid(boardSize,paddingBox)
+grid.hideturtle()
 
-#Movimiento del jugador, también válida que no se salga del tablero.
+# Player movement, also valid that does not go off the board.
 def up():
     y = player.ycor()
-    if(y < (tableroSize*paddingBox)-paddingBox):
+    if(y < (boardSize*paddingBox)-paddingBox):
         player.sety(y + paddingBox)
         print(player.position())
         isMeta()
@@ -130,18 +149,18 @@ def left():
         isMeta()
 def right():
     x = player.xcor()
-    if(x < (tableroSize*paddingBox)-paddingBox):
+    if(x < (boardSize*paddingBox)-paddingBox):
         player.setx(x + paddingBox)
         print(player.position())
         isMeta()
 
-# Listeners del teclado, teclas de flechas ↑ ↓ ← →
+# keyboard listeners, arrow keys ↑ ↓ ← ← →
 window.listen()
 window.onkey(up,"Up")
 window.onkey(down,"Down")
 window.onkey(left,"Left")
 window.onkey(right,"Right")
 
-# Actualización automatica de la ventana.
+# Automatic update of the window.
 while True:
     window.update()
