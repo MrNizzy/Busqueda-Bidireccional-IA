@@ -20,7 +20,7 @@ Para instalar la librería de Numpy.
 
 ## Resultados
 
-![Grid de la interfaz](https://i.postimg.cc/y809bHRc/image.png)
+[![Grid BD_BFS](https://i.postimg.cc/13Tf9kLc/image.png)](https://postimg.cc/cvRshb1r)
 
 ## Recomendaciones
 
