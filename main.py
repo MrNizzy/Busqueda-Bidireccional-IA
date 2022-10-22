@@ -9,10 +9,22 @@ height = 800
 # Size of grid boxes (Affects movements, and correct responsive positioning).
 # Recommended: 50
 paddingBox = 50
+
 # The initial position of the player.
 playerCoord = [1,1]
+
 # The initial position of the target.
 metaCoord = [10, 10]
+
+# Cumulated movement cost
+cost = 0
+
+# Loading of the board via .txt file
+# Accepts only square matrices, i.e. NxN and not NxM
+board = np.loadtxt("./board.txt", delimiter=" ")
+
+# Matrix size for configurations. Do not modify.
+boardSize = len(board)
 
 # Setting the window
 window = turtle.Screen()
@@ -26,44 +38,6 @@ window.addshape('agent.gif')
 window.addshape('chest.gif')
 window.addshape('meta.gif')
 window.addshape('wall.gif')
-
-# Loading of the board via .txt file
-# Accepts only square matrices, i.e. NxN and not NxM
-board = np.loadtxt("./board.txt", delimiter=" ")
-# Matrix size for configurations. Do not modify.
-boardSize = len(board)
-
-def searchItem(item):
-    """
-    It takes an item and returns the position of that item in the board
-    
-    :param item: The item you want to find
-    :return: the location of the item on the board.
-    """
-    for i in range(boardSize):
-        for j in range(boardSize):
-            if board[j][i] == item:
-                return np.array((j,i))
-
-def removeDuplicates(matrix):
-    """
-    For each sublist in the matrix, append the unique elements to a new sublist in the result matrix
-    
-    :param matrix: a list of lists
-    :return: A list of lists.
-    """
-    res = []
-    track = []
-    count = 0
-    
-    for sub in matrix:
-        res.append([]);
-        for ele in sub:
-            if ele not in track:
-                res[count].append(ele)
-                track.append(ele)
-        count += 1
-    return res
 
 # Agent
 size = 4.0
@@ -86,46 +60,6 @@ meta.shapesize(size - 0.5)
 # Sets the initial position of the target with respect to the declared position in the matriz.
 meta.goto(((paddingBox / 2)+(metaCoord[0]*paddingBox)),((boardSize*paddingBox - (paddingBox / 2)) - (metaCoord[1]*paddingBox)))
 
-# Walls
-wall = turtle.Turtle()
-wall.penup()
-wall.shape('wall.gif')
-wall.shapesize(1.3,1.7)
-wall.color("#FFFFFF")
-wall.goto((paddingBox / 2), (paddingBox * boardSize) - (paddingBox / 2))
-
-# Cumulated movement cost
-cost = 0
-
-def isMeta():
-    """
-    If the player is at the same position as the treasure, then the treasure is shown and the player is
-    hidden. Otherwise, the treasure is hidden and the player is shown and also calculates 
-    the accumulated cost for each player's move.
-    :return: a boolean value.
-    """
-    global cost
-    cost = cost + 1
-    print("Cumulative current cost: " + str(cost))
-    if(meta.position() == player.position()):
-        meta.shape("meta.gif")
-        player.hideturtle()
-        return True
-    else:
-        meta.shape("chest.gif")
-        player.showturtle()
-        return False
-
-
-def generateWalls(n,matriz):
-    for i in range(n):
-        for j in range(n):
-            wall.goto((paddingBox / 2), (paddingBox * n) - (paddingBox / 2))
-            if(matriz[j][i] == 1):
-                wall.goto(i*paddingBox+wall.xcor(), wall.ycor()-(j*paddingBox))
-                wall.stamp()
-generateWalls(boardSize,board)
-
 # Setup Grid
 grid = turtle.Turtle()
 grid.pensize(2)
@@ -134,8 +68,37 @@ grid.penup()
 grid.goto(0,0)
 grid.pendown()
 
-# Automatic generation of the grid (grid of lines) depending on the size of the matrix.
+# Walls
+wall = turtle.Turtle()
+wall.penup()
+wall.shape('wall.gif')
+wall.shapesize(1.3,1.7)
+wall.color("#FFFFFF")
+wall.goto((paddingBox / 2), (paddingBox * boardSize) - (paddingBox / 2))
+
+def generateWalls(n,matriz):
+    """
+    It goes through the matrix and if it finds a 1, it stamps a wall in the corresponding position
+    
+    :param n: size of the maze
+    :param matriz: The matrix that contains the walls
+    """
+    for i in range(n):
+        for j in range(n):
+            wall.goto((paddingBox / 2), (paddingBox * n) - (paddingBox / 2))
+            if(matriz[j][i] == 1):
+                wall.goto(i*paddingBox+wall.xcor(), wall.ycor()-(j*paddingBox))
+                wall.stamp()
+generateWalls(boardSize,board)
+
 def generateGrid(n,size):
+    """
+    It draws a grid of n by n squares, each of size size, with a padding of paddingBox between each
+    square
+    
+    :param n: number of boxes in the grid
+    :param size: The size of each box in the grid
+    """
     for i in range(n+1):
         if (grid.xcor() == 0 and grid.ycor() == 0):
             grid.goto(grid.xcor(),(size*n))
@@ -160,26 +123,60 @@ def generateGrid(n,size):
 generateGrid(boardSize,paddingBox)
 grid.hideturtle()
 
+def isMeta():
+    """
+    If the player is at the same position as the treasure, then the treasure is shown and the player is
+    hidden. Otherwise, the treasure is hidden and the player is shown and also calculates 
+    the accumulated cost for each player's move.
+    :return: a boolean value.
+    """
+    global cost
+    cost = cost + 1
+    print("Cumulative current cost: " + str(cost))
+    if(meta.position() == player.position()):
+        meta.shape("meta.gif")
+        player.hideturtle()
+        return True
+    else:
+        meta.shape("chest.gif")
+        player.showturtle()
+        return False
+
 # Player movement, also valid that does not go off the board.
 def up():
+    """
+    Moves the player one position up
+    """
     y = player.ycor()
     if(y < (boardSize*paddingBox)-paddingBox):
         player.sety(y + paddingBox)
         print(player.position())
         isMeta()
+
 def down():
+    """
+    Moves the player one position down
+    """
     y = player.ycor()
     if(y > (paddingBox / 2)):
         player.sety(y - paddingBox)
         print(player.position())
         isMeta()
+
 def left():
+    """
+    Moves the player one position left
+    """
     x = player.xcor()
     if(x > (paddingBox / 2)):
         player.setx(x - paddingBox)
         print(player.position())
         isMeta()
+
 def right():
+    """
+    Moves the player one position right
+    """
     x = player.xcor()
     if(x < (boardSize*paddingBox)-paddingBox):
         player.setx(x + paddingBox)
@@ -196,6 +193,7 @@ def pathAuto():
     pathBdBFS = np.loadtxt("./path.txt",dtype="int")
     xPos = playerCoord[1]
     yPos = playerCoord[0]
+    # Converts the path to non-repeating single values of the array to avoid returning
     path = np.unique(pathBdBFS, axis=0)
 
     # It is a for that moves the player automatically, following the path that is in the 
@@ -215,7 +213,6 @@ def pathAuto():
             xPos-=1
         time.sleep(1)
         window.update()
-
 pathAuto()
 
 # keyboard listeners, arrow keys ↑ ↓ ← ← →
