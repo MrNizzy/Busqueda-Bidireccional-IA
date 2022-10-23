@@ -34,6 +34,12 @@ Usar [Visual Studio Code](https://code.visualstudio.com/)
 
 Para configurar el tablero puedes realizar cambios desde el archivo ``config.py`` donde puedes agregar las coordenadas de inicio del agente y la meta. Para las demás configuraciones avanzadas, como cambio de dimensiones de la ventana, el espacio entre cada caja del tablero, lo puedes realizar en el archivo ``main.py`` aunque es recomendable cambiar estos valores, ya que puede afectar en gran medida a la disposición correcta de los objetos que se verán en pantalla. Por otro lado, el cambio del tamaño de las imágenes (muro, meta, jugador y recompensa) no se puede modificar por qué son las dimensiones originales de los archivos para que no ocupen gran espacio en la pantalla y se puedan visualizar laberintos un poco más grandes.
 
+Comando para ejecutar el programa (Recuerda tener python instalado, al menos una versión no inferior a la 3):
+
+```python
+py main.py
+```
+
 ### Ejemplos de laberinto
 
 * Ejemplo 1.
