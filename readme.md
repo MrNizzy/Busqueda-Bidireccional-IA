@@ -1,6 +1,6 @@
 # Búsqueda bidireccional (BFS) - Curso Inteligencia artificial
 
-[![Stars](https://img.shields.io/github/stars/MrNizzy/WGuides-Angular?style=social)](https://github.com/MrNizzy/WGuides-Angular) [![YouTube](https://img.shields.io/youtube/channel/subscribers/UCFjfIk29NqqPGmrCfCV14Yg?style=social)](https://www.youtube.com/channel/UCFjfIk29NqqPGmrCfCV14Yg) [![Maintainer](https://img.shields.io/badge/Maintained%20by-MrNizzy-blue)](https://www.linkedin.com/in/mrnizzy/ "MrNizzy")
+[![Stars](https://img.shields.io/github/stars/MrNizzy/Busqueda-Bidireccional-IA?style=social)](https://github.com/MrNizzy/Busqueda-Bidireccional-IA) [![YouTube](https://img.shields.io/youtube/channel/subscribers/UCFjfIk29NqqPGmrCfCV14Yg?style=social)](https://www.youtube.com/channel/UCFjfIk29NqqPGmrCfCV14Yg) [![Maintainer](https://img.shields.io/badge/Maintained%20by-MrNizzy-blue)](https://www.linkedin.com/in/mrnizzy/ "MrNizzy")
 
 ## Descripción
 
