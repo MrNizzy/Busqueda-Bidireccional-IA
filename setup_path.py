@@ -1,5 +1,6 @@
 from __future__ import annotations
 import numpy as np
+import config
 
 # It's a type hint that tells the IDE that the variable `Path` is a list of tuples of integers.
 Path = list[tuple[int, int]]
@@ -132,17 +133,16 @@ class BidirectionalBreadthFirstSearch:
         return path
 
 
-if __name__ == "__main__":
-    # all coordinates are given in format [y,x]
-    init = (1, 1)
-    goal = (len(grid) - 2, len(grid[0]) - 2)
+# all coordinates are given in format [y,x]
+init = config.playerCoords
+goal = config.metaCoords
 
-    # It's creating a BidirectionalBreadthFirstSearch object with the start and goal positions, and
-    # then it's calling the `search` method of the object.
-    bd_bfs = BidirectionalBreadthFirstSearch(init, goal)
-    bd_path = bd_bfs.search()
+# It's creating a BidirectionalBreadthFirstSearch object with the start and goal positions, and
+# then it's calling the `search` method of the object.
+bd_bfs = BidirectionalBreadthFirstSearch(init, goal)
+bd_path = bd_bfs.search()
 
-    # It's saving the path to a text file.
-    np.savetxt("./path.txt",bd_path, fmt='%i')
+# It's saving the path to a text file.
+np.savetxt("./path.txt",bd_path, fmt='%i')
 
-    print("The path has been saved correctly. Run main.py to see the animation.")
+print("The path was found. Executing display window. Log in path.txt")

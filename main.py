@@ -1,6 +1,8 @@
 import turtle
 import time
 import numpy as np
+import config
+import setup_path
 
 # Window configuration
 width = 800
@@ -11,10 +13,10 @@ height = 800
 paddingBox = 50
 
 # The initial position of the player.
-playerCoord = [1,1]
+playerCoord = config.playerCoords
 
 # The initial position of the target.
-metaCoord = [10, 10]
+metaCoord = config.metaCoords
 
 # Cumulated movement cost
 cost = 0
@@ -34,10 +36,10 @@ window.bgcolor("#000000")
 window.tracer(0)
 
 # Add new figures with images, only .gif accepted
-window.addshape('agent.gif')
-window.addshape('chest.gif')
-window.addshape('meta.gif')
-window.addshape('wall.gif')
+window.addshape('./assets/agent.gif')
+window.addshape('./assets/chest.gif')
+window.addshape('./assets/meta.gif')
+window.addshape('./assets/wall.gif')
 
 # Agent
 size = 4.0
@@ -45,7 +47,7 @@ print(playerCoord)
 player = turtle.Turtle()
 player.penup()
 player.speed(6)
-player.shape('agent.gif')
+player.shape('./assets/agent.gif')
 player.shapesize(size - 0.5)
 # Sets the initial position of the player with respect to the position declared in the matrix.
 player.goto((paddingBox / 2)+(playerCoord[0]*paddingBox),((boardSize*paddingBox - (paddingBox / 2)) - (playerCoord[1]*paddingBox)))
@@ -55,7 +57,7 @@ player.direction = "stop"
 meta = turtle.Turtle()
 meta.penup()
 meta.speed(0)
-meta.shape("chest.gif")
+meta.shape("./assets/chest.gif")
 meta.shapesize(size - 0.5)
 # Sets the initial position of the target with respect to the declared position in the matriz.
 meta.goto(((paddingBox / 2)+(metaCoord[0]*paddingBox)),((boardSize*paddingBox - (paddingBox / 2)) - (metaCoord[1]*paddingBox)))
@@ -71,7 +73,7 @@ grid.pendown()
 # Walls
 wall = turtle.Turtle()
 wall.penup()
-wall.shape('wall.gif')
+wall.shape('./assets/wall.gif')
 wall.shapesize(1.3,1.7)
 wall.color("#FFFFFF")
 wall.goto((paddingBox / 2), (paddingBox * boardSize) - (paddingBox / 2))
@@ -134,11 +136,11 @@ def isMeta():
     cost = cost + 1
     print("Cumulative current cost: " + str(cost))
     if(meta.position() == player.position()):
-        meta.shape("meta.gif")
+        meta.shape("./assets/meta.gif")
         player.hideturtle()
         return True
     else:
-        meta.shape("chest.gif")
+        meta.shape("./assets/chest.gif")
         player.showturtle()
         return False
 
@@ -185,16 +187,14 @@ def right():
 
 def pathAuto():
     """
-    It loads the path from the file path.txt, and then it is getting the unique values from the path.
-    Then, it is a for that moves the player automatically, following the path that is in the file
-    path.txt
+    It takes the path from the file setup_path.py and moves the player along the path.
     """
-    # Loading the path from the file path.txt, and then it is getting the unique values from the path.
-    pathBdBFS = np.loadtxt("./path.txt",dtype="int")
+    pathBdBFS = setup_path.bd_path
     xPos = playerCoord[1]
     yPos = playerCoord[0]
     # Converts the path to non-repeating single values of the array to avoid returning
-    path = np.unique(pathBdBFS, axis=0)
+    #path = np.unique(pathBdBFS, axis=0)
+    path = pathBdBFS
 
     # It is a for that moves the player automatically, following the path that is in the 
     # file path.txt.
