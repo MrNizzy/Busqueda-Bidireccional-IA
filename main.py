@@ -43,7 +43,7 @@ window.addshape('./assets/wall.gif')
 
 # Agent
 size = 4.0
-print(playerCoord)
+print("\nInitial coordinate: " + str(playerCoord))
 player = turtle.Turtle()
 player.penup()
 player.speed(6)
@@ -59,7 +59,7 @@ meta.penup()
 meta.speed(0)
 meta.shape("./assets/chest.gif")
 meta.shapesize(size - 0.5)
-# Sets the initial position of the target with respect to the declared position in the matriz.
+# Sets the initial position of the target with respect to the declared position in the matrix.
 meta.goto(((paddingBox / 2)+(metaCoord[0]*paddingBox)),((boardSize*paddingBox - (paddingBox / 2)) - (metaCoord[1]*paddingBox)))
 
 # Setup Grid
@@ -78,17 +78,17 @@ wall.shapesize(1.3,1.7)
 wall.color("#FFFFFF")
 wall.goto((paddingBox / 2), (paddingBox * boardSize) - (paddingBox / 2))
 
-def generateWalls(n,matriz):
+def generateWalls(n,matrix):
     """
     It goes through the matrix and if it finds a 1, it stamps a wall in the corresponding position
     
     :param n: size of the maze
-    :param matriz: The matrix that contains the walls
+    :param matrix: The matrix that contains the walls
     """
     for i in range(n):
         for j in range(n):
             wall.goto((paddingBox / 2), (paddingBox * n) - (paddingBox / 2))
-            if(matriz[j][i] == 1):
+            if(matrix[j][i] == 1):
                 wall.goto(i*paddingBox+wall.xcor(), wall.ycor()-(j*paddingBox))
                 wall.stamp()
 generateWalls(boardSize,board)
@@ -152,7 +152,7 @@ def up():
     y = player.ycor()
     if(y < (boardSize*paddingBox)-paddingBox):
         player.sety(y + paddingBox)
-        print(player.position())
+        #print(player.position())
         isMeta()
 
 def down():
@@ -162,7 +162,7 @@ def down():
     y = player.ycor()
     if(y > (paddingBox / 2)):
         player.sety(y - paddingBox)
-        print(player.position())
+        #print(player.position())
         isMeta()
 
 def left():
@@ -172,7 +172,7 @@ def left():
     x = player.xcor()
     if(x > (paddingBox / 2)):
         player.setx(x - paddingBox)
-        print(player.position())
+        #print(player.position())
         isMeta()
 
 def right():
@@ -182,7 +182,7 @@ def right():
     x = player.xcor()
     if(x < (boardSize*paddingBox)-paddingBox):
         player.setx(x + paddingBox)
-        print(player.position())
+        #print(player.position())
         isMeta()
 
 def pathAuto():
@@ -200,15 +200,19 @@ def pathAuto():
     # file path.txt.
     for i in range(len(path)):
         if(yPos < path[i][1]):
+            print(path[i])
             right()
             yPos+=1
         elif (xPos < path[i][0]):
+            print(path[i])
             down()
             xPos+=1
         elif (yPos > path[i][1]):
+            print(path[i])
             left()
             yPos-=1
         elif (xPos > path[i][0]):
+            print(path[i])
             up()
             xPos-=1
         time.sleep(1)

@@ -39,29 +39,6 @@ class BreadthFirstSearch:
         # It's a boolean variable that tells the algorithm if it has reached the goal.
         self.reached = False
 
-    def search(self) -> Path | None:
-        while self.node_queue:
-            current_node = self.node_queue.pop(0)
-
-            # It's checking if the current node is the goal node. If it is, it sets the `reached`
-            # variable to `True` and returns the path from the start to the goal.
-            if current_node.pos == self.target.pos:
-                self.reached = True
-                return self.retrace_path(current_node)
-
-            # It's getting the successors of the current node.
-            successors = self.get_successors(current_node)
-
-            # It's adding the successors of the current node to the queue.
-            for node in successors:
-                self.node_queue.append(node)
-
-        # It's checking if the algorithm has reached the goal. If it hasn't, it returns the start
-        # position.
-        if not self.reached:
-            return [self.start.pos]
-        return None
-
     def get_successors(self, parent: Node) -> list[Node]:
         successors = []
         for action in delta:
@@ -69,10 +46,8 @@ class BreadthFirstSearch:
             pos_y = parent.pos_y + action[0]
             if not (0 <= pos_x <= len(grid[0]) - 1 and 0 <= pos_y <= len(grid) - 1):
                 continue
-
             if grid[pos_y][pos_x] != 0:
                 continue
-
             successors.append(
                 Node(pos_x, pos_y, self.target.pos_y, self.target.pos_x, parent)
             )
@@ -95,34 +70,42 @@ class BidirectionalBreadthFirstSearch:
     def __init__(self, start, goal):
         self.fwd_bfs = BreadthFirstSearch(start, goal)
         self.bwd_bfs = BreadthFirstSearch(goal, start)
-        self.reached = False
 
     def search(self) -> Path | None:
-        while self.fwd_bfs.node_queue or self.bwd_bfs.node_queue:
-            current_fwd_node = self.fwd_bfs.node_queue.pop(0)
-            current_bwd_node = self.bwd_bfs.node_queue.pop(0)
+        for i in range(10):
+            new_queue = []
+            for node in self.fwd_bfs.node_queue:
+                childs = self.fwd_bfs.get_successors(node)
+                for child in childs:
+                    # Comparison
+                    for bwd_node in self.bwd_bfs.node_queue:
+                        if child.pos == bwd_node.pos:
+                            return self.retrace_bidirectional_path(
+                                child, bwd_node
+                            )
+                    ##
+                    new_queue.append(child)
+            self.fwd_bfs.node_queue = new_queue
+                
+            new_queue = []
+            for node in self.bwd_bfs.node_queue:
+                childs = self.bwd_bfs.get_successors(node)
+                for child in childs:
+                    # Comparison
+                    for fwd_node in self.fwd_bfs.node_queue:
+                        if child.pos == fwd_node.pos:
+                            return self.retrace_bidirectional_path(
+                                fwd_node, child
+                            )
+                    ##
+                    new_queue.append(child)
+            self.bwd_bfs.node_queue = new_queue
+        # The case that there is no solution at the established depth is handled. 
+        return
 
-            if current_bwd_node.pos == current_fwd_node.pos:
-                self.reached = True
-                return self.retrace_bidirectional_path(
-                    current_fwd_node, current_bwd_node
-                )
-
-            self.fwd_bfs.target = current_bwd_node
-            self.bwd_bfs.target = current_fwd_node
-
-            successors = {
-                self.fwd_bfs: self.fwd_bfs.get_successors(current_fwd_node),
-                self.bwd_bfs: self.bwd_bfs.get_successors(current_bwd_node),
-            }
-
-            for bfs in [self.fwd_bfs, self.bwd_bfs]:
-                for node in successors[bfs]:
-                    bfs.node_queue.append(node)
-
-        if not self.reached:
-            return [self.fwd_bfs.start.pos]
-        return None
+    def viewList(self, list):
+        for node in list:
+            print(node.pos)
 
     def retrace_bidirectional_path(self, fwd_node: Node, bwd_node: Node) -> Path:
         fwd_path = self.fwd_bfs.retrace_path(fwd_node)
@@ -130,6 +113,8 @@ class BidirectionalBreadthFirstSearch:
         bwd_path.pop()
         bwd_path.reverse()
         path = fwd_path + bwd_path
+        print(path)
+        print("Intersect: ", fwd_node.pos)
         return path
 
 
